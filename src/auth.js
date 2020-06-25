@@ -1,6 +1,6 @@
-import * as __utils  from './lib/utils.js'; 
-import * as __token  from './lib/token.js'; 
-import * as __cookie from './lib/cookie.js'; 
+import * as __utils  from './lib/utils.js';
+import * as __token  from './lib/token.js';
+import * as __cookie from './lib/cookie.js';
 
 var __auth = null;
 
@@ -160,14 +160,14 @@ function _parseRequestIntercept(req) {
     if (req && req.ignoreVueAuth) {
         return req;
     }
-    
+
     if (
         req.impersonating === false &&
         __auth.impersonating()
     ) {
         tokenName = __auth.options.tokenDefaultKey;
     }
-    
+
     token = __token.get.call(__auth, tokenName);
 
     if (token) {
@@ -266,7 +266,7 @@ function _processAuthenticated(cb) {
         }
         else {
             _processFetch({});
-            
+
             return cb.call(__auth);
         }
     } else {
@@ -279,7 +279,8 @@ function _processAuthenticated(cb) {
 function _processTransitionEach(transition, routeAuth, cb) {
     var authRedirect = (routeAuth || '').redirect || __auth.options.authRedirect,
         forbiddenRedirect = (routeAuth || '').forbiddenRedirect || (routeAuth || '').redirect || __auth.options.forbiddenRedirect,
-        notFoundRedirect = (routeAuth || '').notFoundRedirect || (routeAuth || '').redirect || __auth.options.notFoundRedirect;
+        notFoundRedirect = (routeAuth || '').notFoundRedirect || (routeAuth || '').redirect || __auth.options.notFoundRedirect,
+        excludes = __utils.toArray((routeAuth || '').excludes !== undefined ? routeAuth.excludes : undefined);
 
     routeAuth = __utils.toArray((routeAuth || '').roles !== undefined ? routeAuth.roles : routeAuth);
 
@@ -293,7 +294,13 @@ function _processTransitionEach(transition, routeAuth, cb) {
 
             cb.call(__auth, authRedirect);
         }
-        else if ((routeAuth.constructor === Array || __utils.isObject(routeAuth)) && ! __utils.compare(routeAuth, __auth.$vm.data[__auth.options.rolesKey])) {
+        else if (
+          (routeAuth.constructor === Array || __utils.isObject(routeAuth)) &&
+          (
+            ! __utils.compare(routeAuth, __auth.$vm.data[__auth.options.rolesKey]) ||
+            __utils.compare(excludes, __auth.$vm.data[__auth.options.rolesKey])
+          )
+        ) {
             __auth.transitionRedirectType = 403;
 
             if (typeof forbiddenRedirect === 'function') {
@@ -340,7 +347,7 @@ function _processLogout(redirect) {
 
     __token.remove.call(__auth, __auth.options.tokenImpersonateKey);
     __token.remove.call(__auth, __auth.options.tokenDefaultKey);
-    
+
     __token.remove.call(__auth, __auth.options.staySignedInKey);
 
     __auth.$vm.loaded = true;
@@ -388,13 +395,13 @@ function _initVm() {
 
 function _initDriverCheck() {
     var i, ii;
-    
+
     var drivers = ['auth', 'http', 'router'];
 
     for (i = 0, ii = drivers.length; i < ii; i++) {
         if ( ! __auth.options[drivers[i]]) {
             console.error('Error (@websanova/vue-auth): "' + drivers[i] + '" driver must be set.');
-            
+
             return false;
         }
 
@@ -403,7 +410,7 @@ function _initDriverCheck() {
 
             if (msg) {
                 console.error('Error (@websanova/vue-auth): ' + msg);
-                
+
                 return false;
             }
         }
@@ -428,13 +435,13 @@ function _initRefreshInterval() {
 
 function _initInterceptors() {
     __auth.http.interceptor.call(__auth, _parseRequestIntercept, _parseResponseIntercept);
-    
+
     __auth.router.beforeEach.call(__auth, _processRouterBeforeEach, _processTransitionEach, _setTransitions, _getAuthMeta);
 }
 
 function Auth(Vue, options) {
     __auth  = this;
-    
+
     options = options || {};
 
     this.Vue     = Vue;
@@ -583,7 +590,7 @@ Auth.prototype.login = function (data) {
                 }
                 else {
                     _processFetch(_parseUserResponseData(res), data.redirect);
-                    
+
                     resolve(res);
                 }
             }, function(res) {
@@ -638,7 +645,7 @@ Auth.prototype.impersonate = function (data) {
 
     return new Promise(function(resolve, reject) {
         var token = __auth.token();
-        
+
         __auth.http.http
             .call(__auth, data)
             .then(function(res) {
@@ -713,7 +720,7 @@ Auth.prototype.oauth2 = function (type, data) {
             console.error('vue-auth:error There was an issue retrieving the state data.');
             data.state = data.state || {};
         }
-        
+
         data = __utils.extend(__auth.options.oauth2Data, [data.state, data]);
 
         delete data.code;
@@ -724,7 +731,7 @@ Auth.prototype.oauth2 = function (type, data) {
     }
 
     data = __utils.extend(__auth.options.oauth2[type], data);
-    
+
     data.params.state        = JSON.stringify(data.params.state || {});
     data.params.redirect_uri = _parseRedirectUri(data.params.redirect_uri);
 
