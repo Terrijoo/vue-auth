@@ -31,7 +31,7 @@
     "scripts": {
         "clear": "rm -rf dist/*",
 
-        "build": "npm run clear; node build/build.js"
+        "build": "node build/build.js"
     },
 
     "devDependencies": {
