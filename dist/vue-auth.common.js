@@ -121,16 +121,16 @@ function setCookie(key, value, params) {
       continue;
     } // If null and an option method exists such ex: "getCookieDomain".
     else if (params[i] === null) {
-        if (this.options['getCookie' + i]) {
-          cookie += ' ' + i + '=' + this.options['getCookie' + i]() + ';';
-        }
-      } // If true just set the flag as in "Secure;".
-      else if (params[i] === true) {
-          cookie += ' ' + i + ';';
-        } // Default key/val.
-        else {
-            cookie += ' ' + i + '=' + params[i] + ';';
-          }
+      if (this.options['getCookie' + i]) {
+        cookie += ' ' + i + '=' + this.options['getCookie' + i]() + ';';
+      }
+    } // If true just set the flag as in "Secure;".
+    else if (params[i] === true) {
+      cookie += ' ' + i + ';';
+    } // Default key/val.
+    else {
+      cookie += ' ' + i + '=' + params[i] + ';';
+    }
   }
 
   document.cookie = cookie;
@@ -170,7 +170,7 @@ function get(key) {
 }
 
 function remove(key) {
-  var params = this.options.cookie;
+  var params = Object.assign({}, this.options.cookie);
   params.Expires = getDate(-12096e5);
   setCookie.call(this, key, '', params);
 }
