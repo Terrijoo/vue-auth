@@ -425,6 +425,7 @@ function _initRefreshInterval() {
         setInterval(function () {
             if (
                 __auth.options.refreshData.enabled &&
+                __auth.$vm.authenticated &&
                 !_isTokenExpired()
             ) {
                 __auth.refresh();
