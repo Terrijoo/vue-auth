@@ -688,7 +688,7 @@
     function _initRefreshInterval() {
       if (__auth.options.refreshData.enabled && __auth.options.refreshData.interval > 0) {
         setInterval(function () {
-          if (__auth.options.refreshData.enabled && !_isTokenExpired()) {
+          if (__auth.options.refreshData.enabled && __auth.$vm.authenticated && !_isTokenExpired()) {
             __auth.refresh();
           }
         }, __auth.options.refreshData.interval * 1000 * 60); // In minutes.
