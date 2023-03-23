@@ -12,17 +12,22 @@ var vueRouter_2_x = {
   },
   // bindData: function (data, ctx) {
   //     var error, success;
+
   //     data = data || {};
+
   //     error = data.error;
   //     success = data.success;
+
   //     data.query = ctx.$route.query || {};
+
   //     if (data.success) { data.success = function (res) { success.call(ctx, res); } }
   //     if (data.error) { data.error = function (res) { error.call(ctx, res); } }
+
   //     return data;
   // },
+
   beforeEach: function (routerBeforeEach, transitionEach, setTransitions, getAuthMeta) {
     var _this = this;
-
     this.Vue.router.beforeEach(function (transition, location, next) {
       setTransitions(transition);
       routerBeforeEach.call(_this, function () {
@@ -31,9 +36,9 @@ var vueRouter_2_x = {
           if (!redirect) {
             (next || transition.next)();
             return;
-          } // router v2.x
+          }
 
-
+          // router v2.x
           if (next) {
             next(redirect);
           } else {

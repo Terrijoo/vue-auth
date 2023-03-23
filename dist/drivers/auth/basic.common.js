@@ -14,7 +14,7 @@ var basic = {
   },
   response: function (res) {
     var headers = this.http.getHeaders.call(this, res),
-        token = headers.Authorization || headers.authorization;
+      token = headers.Authorization || headers.authorization;
     return token;
   }
 };
