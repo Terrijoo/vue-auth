@@ -39,7 +39,7 @@
     "licenses": "MIT, GPL",
     "scripts": {
         "clear": "rm -rf dist/*",
-        "build": "node build/build.js"
+        "doBuild": "node build/build.js"
     },
     "devDependencies": {
         "@babel/core": "^7.2.2",
