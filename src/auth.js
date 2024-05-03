@@ -44,7 +44,8 @@ var __defaultOptions = {
 
     getUrl: _getUrl,
     getCookieDomain: _getCookieDomain,
-    parseUserData: _parseUserData
+    parseUserData: _parseUserData,
+    parseRefreshData: _parseRefreshData,
 };
 
 function _isAccess(role, key) {
@@ -137,6 +138,14 @@ function _setTransitions (transition) {
 
 function _parseUserData(data) {
     return data.data || {};
+}
+
+function _parseRefreshData(data) {
+    return data.data || {};
+}
+
+function _parseFetchResponseData(res) {
+    return __auth.options.parseRefreshData(__auth.http.httpData(res));
 }
 
 function _parseUserResponseData(res) {
@@ -541,7 +550,14 @@ Auth.prototype.fetch = function (data) {
 Auth.prototype.refresh = function (data) {
     data = __utils.extend(__auth.options.refreshData, data);
 
-    return __auth.http.http.call(__auth, data);
+    return new Promise(function(resolve, reject) {
+        __auth.http.http
+            .call(__auth, data)
+            .then(function(res) {
+                _parseFetchResponseData(res);
+                resolve(res);
+            }, reject);
+    });
 };
 
 Auth.prototype.register = function (data) {
